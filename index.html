@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Jan Lönnqvist · Design Lead · Dragons Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #080812;
+    --blue: #4d9fff;
+    --purple: #9333ea;
+    --text: #ffffff;
+    --text-dim: rgba(255,255,255,0.6);
+    --text-muted: rgba(255,255,255,0.3);
+    --border: rgba(255,255,255,0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+#scroll-spacer { height: 1400vh; }
+
+#webgl {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+/* Custom cursor */
+.cursor {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid var(--blue);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s;
+    mix-blend-mode: difference;
+}
+
+.cursor.hover {
+    width: 64px;
+    height: 64px;
+    background: rgba(77, 159, 255, 0.08);
+    border-color: var(--purple);
+}
+
+.cursor-dot {
+    position: fixed;
+    width: 5px;
+    height: 5px;
+    background: var(--blue);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+}
+
+/* Loader */
+#loader {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.8s ease, visibility 0.8s;
+}
+
+#loader.done { opacity: 0; visibility: hidden; }
+
+.loader-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: loaderPulse 1.5s ease-in-out infinite;
+}
+
+.loader-bar {
+    width: 120px;
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+}
+
+.loader-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    animation: loaderFill 1.8s ease-in-out forwards;
+}
+
+@keyframes loaderPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes loaderFill {
+    to { width: 100%; }
+}
+
+/* Navigation */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 28px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+}
+
+.nav-logo img {
+    height: 28px;
+    width: auto;
+}
+
+.nav-links {
+    display: flex;
+    gap: 36px;
+}
+
+.nav-links a {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s;
+    cursor: none;
+}
+
+.nav-links a:hover { color: var(--blue); }
+
+/* Content zones */
+.zone {
+    position: fixed;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zone.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Hero */
+.zone-hero {
+    bottom: 14vh;
+    left: 6vw;
+    max-width: 600px;
+    transform: translateY(40px);
+}
+
+.zone-hero.active { transform: translateY(0); }
+
+.hero-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.hero-label::before {
+    content: '';
+    width: 36px;
+    height: 1.5px;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+}
+
+.hero-name {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(56px, 10vw, 110px);
+    font-weight: 800;
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+}
+
+.hero-name .outline {
+    -webkit-text-stroke: 1.5px var(--text);
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-role {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 440px;
+}
+
+.hero-role strong {
+    color: var(--text);
+    font-weight: 500;
+}
+
+/* Side zones */
+.zone-side {
+    top: 50%;
+    max-width: 440px;
+    transform: translateY(-50%);
+}
+
+.zone-side.left {
+    left: 6vw;
+    transform: translateY(-50%) translateX(-60px);
+}
+
+.zone-side.left.active {
+    transform: translateY(-50%) translateX(0);
+}
+
+.zone-side.right {
+    right: 6vw;
+    text-align: right;
+    transform: translateY(-50%) translateX(60px);
+}
+
+.zone-side.right.active {
+    transform: translateY(-50%) translateX(0);
+}
+
+.zone-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.zone-side.right .zone-label {
+    justify-content: flex-end;
+}
+
+.zone-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+}
+
+.zone-label.blue { color: var(--blue); }
+.zone-label.blue::before { background: var(--blue); }
+.zone-label.purple { color: var(--purple); }
+.zone-label.purple::before { background: var(--purple); }
+.zone-label.grad {
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.zone-label.grad::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+
+.zone-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+}
+
+.zone-text {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-dim);
+    line-height: 1.8;
+}
+
+.zone-text .hl { color: var(--text); font-weight: 500; }
+
+.zone-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+.zone-side.right .zone-tags { justify-content: flex-end; }
+
+.tag {
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    transition: all 0.3s;
+}
+
+.tag:hover { border-color: var(--blue); color: var(--blue); }
+.tag.blue { border-color: rgba(77,159,255,0.25); color: var(--blue); }
+.tag.purple { border-color: rgba(147,51,234,0.25); color: var(--purple); }
+
+.zone-period {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+}
+
+/* CTA zone */
+.zone-cta {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(40px);
+    text-align: center;
+    max-width: 560px;
+}
+
+.zone-cta.active {
+    transform: translate(-50%, -50%) translateY(0);
+}
+
+.cta-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 16px;
+}
+
+.cta-title .grad {
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cta-text {
+    font-size: 15px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 36px;
+}
+
+.cta-buttons { display: flex; gap: 14px; justify-content: center; }
+
+.btn {
+    padding: 15px 32px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s;
+    cursor: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(77, 159, 255, 0.25);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+
+/* Progress bar */
+.progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    z-index: 101;
+    width: 0%;
+    transition: width 0.1s;
+}
+
+/* Zone marker */
+.zone-marker {
+    position: fixed;
+    right: 48px;
+    bottom: 48px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    z-index: 100;
+}
+
+.zone-marker .num {
+    color: var(--blue);
+    margin-right: 10px;
+    font-weight: 600;
+}
+
+/* Scroll hint */
+.scroll-hint {
+    position: fixed;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.5s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.scroll-hint.hidden { opacity: 0; }
+
+.scroll-line {
+    width: 1px;
+    height: 32px;
+    background: linear-gradient(to bottom, var(--blue), transparent);
+    animation: scrollPulse 2s infinite;
+}
+
+@keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+    50% { opacity: 1; transform: scaleY(1); }
+}
+
+/* Ambient glow */
+.glow {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(120px);
+}
+
+.glow-blue {
+    width: 500px;
+    height: 500px;
+    background: rgba(77, 159, 255, 0.06);
+    top: -10%;
+    right: -5%;
+}
+
+.glow-purple {
+    width: 400px;
+    height: 400px;
+    background: rgba(147, 51, 234, 0.05);
+    bottom: -10%;
+    left: -5%;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor, .cursor-dot { display: none; }
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .zone-hero { left: 5vw; right: 5vw; bottom: 10vh; }
+    .zone-side { max-width: 85vw; }
+    .zone-side.left { left: 5vw; }
+    .zone-side.right { right: 5vw; }
+    .zone-marker { right: 24px; bottom: 24px; }
+    .cta-buttons { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+    <div class="loader-text">Dragons</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<div class="glow glow-blue"></div>
+<div class="glow glow-purple"></div>
+
+<canvas id="webgl"></canvas>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav>
+    <div class="nav-logo"><img src="footer-logo.webp" alt="Dragons Group"></div>
+    <div class="nav-links">
+        <a href="#" onclick="scrollToZone(0);return false;">Start</a>
+        <a href="#" onclick="scrollToZone(5);return false;">Experience</a>
+        <a href="#" onclick="scrollToZone(10);return false;">Contact</a>
+    </div>
+</nav>
+
+<!-- Zone 0: Hero -->
+<div class="zone zone-hero active" data-zone="0">
+    <div class="hero-label">Design Lead</div>
+    <h1 class="hero-name">JAN<br><span class="outline">LÖNNQVIST</span></h1>
+    <p class="hero-role">A decade of <strong>leading creative teams, building brand systems, and directing campaigns</strong> for global brands across 40+ markets. From art direction at Helsinki agencies to EMEA-scale design leadership — setting the vision, raising the bar, and shipping world-class work.</p>
+</div>
+
+<!-- Zone 1: Leadership Philosophy -->
+<div class="zone zone-side left" data-zone="1">
+    <div class="zone-label blue">Design Leadership</div>
+    <h2 class="zone-title">Vision to<br>Execution</h2>
+    <p class="zone-text">Design leadership isn't about making every decision — it's about <span class="hl">creating the conditions for exceptional work</span>. Setting creative direction. Building frameworks that empower designers. Bridging the gap between <span class="hl">strategic intent and craft-level execution</span> across teams, markets, and channels.</p>
+    <div class="zone-tags">
+        <span class="tag blue">Creative Direction</span>
+        <span class="tag blue">Team Building</span>
+        <span class="tag">Design Strategy</span>
+        <span class="tag">Mentorship</span>
+    </div>
+</div>
+
+<!-- Zone 2: GLS Group -->
+<div class="zone zone-side right" data-zone="2">
+    <div class="zone-label purple">Current Role</div>
+    <div class="zone-period">2024 — Present</div>
+    <h2 class="zone-title">GLS Group</h2>
+    <p class="zone-text">Group Graphic Designer operating at <span class="hl">EMEA-wide scale across 40+ countries</span>. Owning brand systems, campaign design, video, and expo work at continental scale. <span class="hl">Pioneering AI-integrated workflows</span> — training the team on AI tools, establishing new processes, and multiplying creative output across the organization.</p>
+    <div class="zone-tags">
+        <span class="tag purple">40+ Countries</span>
+        <span class="tag purple">AI Workflows</span>
+        <span class="tag">Brand Systems</span>
+        <span class="tag">Process Design</span>
+    </div>
+</div>
+
+<!-- Zone 3: DHL / Freelance -->
+<div class="zone zone-side left" data-zone="3">
+    <div class="zone-label blue">Freelance</div>
+    <div class="zone-period">Feb 2024 — Aug 2024</div>
+    <h2 class="zone-title">DHL Campaign<br>Delivery</h2>
+    <p class="zone-text">Senior Graphic Designer leading campaign production spanning <span class="hl">12+ markets and 26 locations</span>. Directed multi-market localization, ensuring brand consistency at speed. Launch campaign achieved <span class="hl">20% of targeted leads in month one</span> across a 12-month roadmap.</p>
+    <div class="zone-tags">
+        <span class="tag blue">12+ Markets</span>
+        <span class="tag blue">26 Locations</span>
+        <span class="tag">Campaign Direction</span>
+    </div>
+</div>
+
+<!-- Zone 4: Rituals -->
+<div class="zone zone-side right" data-zone="4">
+    <div class="zone-label purple">Full-time</div>
+    <div class="zone-period">Sep 2022 — Feb 2024</div>
+    <h2 class="zone-title">Rituals</h2>
+    <p class="zone-text">Visual Specialist — <span class="hl">in-store campaign design, packaging, and point-of-sale visuals</span> across global retail. Key projects include the <span class="hl">Hammam and Legend of the Dragon</span> seasonal campaigns. Owned the visual execution pipeline from concept adaptation to production-ready delivery.</p>
+    <div class="zone-tags">
+        <span class="tag purple">Packaging</span>
+        <span class="tag purple">In-Store</span>
+        <span class="tag">POS Design</span>
+        <span class="tag">Campaigns</span>
+    </div>
+</div>
+
+<!-- Zone 5: HelloFresh -->
+<div class="zone zone-side left" data-zone="5">
+    <div class="zone-label blue">Contract</div>
+    <div class="zone-period">Apr 2022 — Sep 2022</div>
+    <h2 class="zone-title">HelloFresh</h2>
+    <p class="zone-text">Creative / DTP — <span class="hl">led a team of three designers</span>, managing recipe card design and print production across <span class="hl">Benelux and France</span>. Hands-on team leadership: setting priorities, reviewing work, managing stakeholders, and maintaining quality across multi-market delivery.</p>
+    <div class="zone-tags">
+        <span class="tag blue">Team Lead</span>
+        <span class="tag blue">Benelux & France</span>
+        <span class="tag">Cross-Market</span>
+    </div>
+</div>
+
+<!-- Zone 6: Valve & Art Direction -->
+<div class="zone zone-side right" data-zone="6">
+    <div class="zone-label purple">Art Direction</div>
+    <div class="zone-period">Mar 2019 — Sep 2019</div>
+    <h2 class="zone-title">Valve Helsinki</h2>
+    <p class="zone-text"><span class="hl">Art Director</span> — creative and art direction for agency client campaigns. Concept development, visual storytelling, and production oversight. Setting the creative bar and directing designers, photographers, and production teams to deliver on the vision.</p>
+    <div class="zone-tags">
+        <span class="tag purple">Art Direction</span>
+        <span class="tag purple">Creative Direction</span>
+        <span class="tag">Agency</span>
+    </div>
+</div>
+
+<!-- Zone 7: IKEA & Helsinki Agencies -->
+<div class="zone zone-side left" data-zone="7">
+    <div class="zone-label grad">Foundation</div>
+    <div class="zone-period">2013 — 2020</div>
+    <h2 class="zone-title">IKEA &<br>Helsinki</h2>
+    <p class="zone-text">Graphic Artist at <span class="hl">IKEA Group</span> — campaigns, sustainability initiatives, and brand guideline execution. Plus five formative years across <span class="hl">Planex, Pixmill, Cocomms, Lönnberg, and Multiprint</span>. Deep expertise in prepress, offset, color management, and production — the craft foundation underpinning every creative decision I make.</p>
+    <div class="zone-tags">
+        <span class="tag blue">IKEA</span>
+        <span class="tag purple">Prepress</span>
+        <span class="tag">Production</span>
+        <span class="tag">Brand Identity</span>
+    </div>
+</div>
+
+<!-- Zone 8: Capabilities -->
+<div class="zone zone-side right" data-zone="8">
+    <div class="zone-label blue">Capabilities</div>
+    <h2 class="zone-title">How I<br>Lead</h2>
+    <p class="zone-text"><span class="hl">Creative direction</span> — setting the vision and guarding quality. <span class="hl">Team development</span> — mentoring designers and building capability. <span class="hl">Process architecture</span> — designing workflows that scale. <span class="hl">AI integration</span> — building next-generation production pipelines. Full Adobe CC, Figma, After Effects, Premiere Pro.</p>
+    <div class="zone-tags">
+        <span class="tag blue">Creative Direction</span>
+        <span class="tag purple">Team Development</span>
+        <span class="tag blue">Process Design</span>
+        <span class="tag purple">AI Integration</span>
+        <span class="tag">Figma</span>
+    </div>
+</div>
+
+<!-- Zone 9: Why Dragons -->
+<div class="zone zone-side left" data-zone="9">
+    <div class="zone-label grad">Why Dragons</div>
+    <h2 class="zone-title">Leading at<br>Agency Scale</h2>
+    <p class="zone-text">Dragons Group builds <span class="hl">embedded creative teams for global brands</span> — leading those teams is exactly where I belong. A decade of experience scaling creative output across markets, mentoring designers, and bridging brand strategy with production reality.<br><br>As a queer creative, I'm drawn to Dragons' commitment to <span class="hl">diverse perspectives and inclusive culture</span>. A women-owned agency that actively champions the LGBTIQ+ community is the kind of environment where <span class="hl">bold leadership and authentic craft</span> come together to produce the best work.</p>
+</div>
+
+<!-- Zone 10: CTA -->
+<div class="zone zone-cta" data-zone="10">
+    <h2 class="cta-title">Let's Lead<br><span class="grad">Something Bold</span></h2>
+    <p class="cta-text">Ready to bring EMEA-scale design leadership, team-building expertise, and next-generation creative workflows to Dragons Group.</p>
+    <div class="cta-buttons">
+        <a href="https://definitelynotjan.github.io/Portfolio/" target="_blank" class="btn btn-primary">View Portfolio</a>
+        <a href="mailto:jan.lonnqvist@windowslive.com" class="btn btn-secondary">Get in Touch</a>
+    </div>
+</div>
+
+<div class="zone-marker"><span class="num">01</span><span id="zoneLabel">START</span></div>
+<div class="scroll-hint" id="scrollHint">Scroll<div class="scroll-line"></div></div>
+
+<div id="scroll-spacer"></div>
+
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const cursorDot = document.getElementById('cursorDot');
+let mouseX = innerWidth / 2, mouseY = innerHeight / 2;
+let cursorX = mouseX, cursorY = mouseY;
+
+document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+document.querySelectorAll('a, .btn').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+});
+
+// ── LOADER ──
+const loader = document.getElementById('loader');
+setTimeout(() => loader.classList.add('done'), 2200);
+
+// ── THREE.JS ──
+const canvas = document.getElementById('webgl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x080812);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x080812, 0.015);
+
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000);
+camera.position.set(0, 0, 18);
+
+// Post-processing
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(innerWidth, innerHeight),
+    0.6, 0.4, 0.85
+);
+composer.addPass(bloomPass);
+
+// ── ENVIRONMENT MAP ──
+const pmremGenerator = new THREE.PMREMGenerator(renderer);
+const envScene = new THREE.Scene();
+const envGeo = new THREE.IcosahedronGeometry(100, 4);
+const envMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    uniforms: {},
+    vertexShader: `
+        varying vec3 vWorldPos;
+        void main() {
+            vWorldPos = position;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        varying vec3 vWorldPos;
+        void main() {
+            vec3 dir = normalize(vWorldPos);
+            float t = dir.y * 0.5 + 0.5;
+            vec3 col = mix(vec3(0.02, 0.01, 0.06), vec3(0.05, 0.08, 0.15), t);
+            float s1 = smoothstep(0.85, 1.0, dot(dir, normalize(vec3(1.0, 0.8, -0.5))));
+            float s2 = smoothstep(0.88, 1.0, dot(dir, normalize(vec3(-0.8, 0.3, 0.7))));
+            float s3 = smoothstep(0.9, 1.0, dot(dir, normalize(vec3(0.2, -0.9, 0.3))));
+            col += vec3(0.3, 0.6, 1.0) * s1 * 0.6;
+            col += vec3(0.58, 0.2, 0.92) * s2 * 0.5;
+            col += vec3(0.3, 0.6, 1.0) * s3 * 0.3;
+            gl_FragColor = vec4(col, 1.0);
+        }
+    `
+});
+envScene.add(new THREE.Mesh(envGeo, envMat));
+const envMap = pmremGenerator.fromScene(envScene, 0.04).texture;
+scene.environment = envMap;
+
+// ── MORPHING CHROME SHAPE ──
+const shapeGeo = new THREE.IcosahedronGeometry(3.5, 64);
+const shapePositions = shapeGeo.attributes.position.array.slice();
+const shapeNormals = shapeGeo.attributes.normal.array.slice();
+
+const shapeMat = new THREE.MeshPhysicalMaterial({
+    color: 0x1a1a3e,
+    metalness: 0.95,
+    roughness: 0.05,
+    envMap: envMap,
+    envMapIntensity: 2.0,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.02,
+    iridescence: 1.0,
+    iridescenceIOR: 1.5,
+    iridescenceThicknessRange: [100, 800],
+    sheen: 0.3,
+    sheenColor: new THREE.Color(0x4d9fff),
+});
+
+const shapeMesh = new THREE.Mesh(shapeGeo, shapeMat);
+scene.add(shapeMesh);
+
+// ── ORBITING RINGS ──
+const ringGroup = new THREE.Group();
+const ringMat1 = new THREE.MeshStandardMaterial({
+    color: 0x4d9fff, emissive: 0x4d9fff, emissiveIntensity: 0.3,
+    metalness: 0.8, roughness: 0.2, transparent: true, opacity: 0.4
+});
+const ringMat2 = new THREE.MeshStandardMaterial({
+    color: 0x9333ea, emissive: 0x9333ea, emissiveIntensity: 0.3,
+    metalness: 0.8, roughness: 0.2, transparent: true, opacity: 0.3
+});
+
+const ring1 = new THREE.Mesh(new THREE.TorusGeometry(5.5, 0.02, 16, 120), ringMat1);
+ring1.rotation.x = Math.PI * 0.5;
+ringGroup.add(ring1);
+
+const ring2 = new THREE.Mesh(new THREE.TorusGeometry(6.5, 0.015, 16, 120), ringMat2);
+ring2.rotation.x = Math.PI * 0.35;
+ring2.rotation.z = Math.PI * 0.2;
+ringGroup.add(ring2);
+
+const ring3 = new THREE.Mesh(new THREE.TorusGeometry(7.5, 0.01, 16, 120), ringMat1);
+ring3.rotation.x = Math.PI * 0.65;
+ring3.rotation.z = -Math.PI * 0.15;
+ringGroup.add(ring3);
+
+scene.add(ringGroup);
+
+// ── FLOATING PARTICLES ──
+const particleCount = 200;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(particleCount * 3);
+const pBasePos = [];
+
+for (let i = 0; i < particleCount; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = 8 + Math.random() * 20;
+    const x = r * Math.sin(phi) * Math.cos(theta);
+    const y = r * Math.sin(phi) * Math.sin(theta);
+    const z = r * Math.cos(phi);
+    pPos[i * 3] = x; pPos[i * 3 + 1] = y; pPos[i * 3 + 2] = z;
+    pBasePos.push({ x, y, z });
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+
+const pCanvas = document.createElement('canvas');
+pCanvas.width = 32; pCanvas.height = 32;
+const pCtx = pCanvas.getContext('2d');
+const pGrad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+pGrad.addColorStop(0, 'rgba(255,255,255,1)');
+pGrad.addColorStop(0.4, 'rgba(255,255,255,0.4)');
+pGrad.addColorStop(1, 'rgba(255,255,255,0)');
+pCtx.fillStyle = pGrad;
+pCtx.fillRect(0, 0, 32, 32);
+
+const pMat = new THREE.PointsMaterial({
+    size: 0.15, map: new THREE.CanvasTexture(pCanvas), color: 0x6db3ff,
+    transparent: true, opacity: 0.5,
+    blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+});
+scene.add(new THREE.Points(pGeo, pMat));
+
+// ── GRID FLOOR ──
+const gridHelper = new THREE.GridHelper(60, 40, 0x1a1a3e, 0x0d0d1a);
+gridHelper.position.y = -8;
+gridHelper.material.transparent = true;
+gridHelper.material.opacity = 0.3;
+scene.add(gridHelper);
+
+// ── LIGHTING ──
+scene.add(new THREE.AmbientLight(0x1a1a3e, 0.3));
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+keyLight.position.set(8, 12, 10);
+scene.add(keyLight);
+
+const blueLight = new THREE.PointLight(0x4d9fff, 1.5, 40);
+blueLight.position.set(-8, 5, 8);
+scene.add(blueLight);
+
+const purpleLight = new THREE.PointLight(0x9333ea, 1.0, 40);
+purpleLight.position.set(8, -5, -6);
+scene.add(purpleLight);
+
+const rimLight = new THREE.DirectionalLight(0x4d9fff, 0.4);
+rimLight.position.set(-5, -3, -10);
+scene.add(rimLight);
+
+// ── NOISE ──
+function noise3D(x, y, z) {
+    return Math.sin(x * 1.7 + y * 0.9) * Math.cos(y * 1.3 + z * 1.1) * Math.sin(z * 0.8 + x * 1.4)
+         + Math.sin(x * 3.1 + z * 2.3) * 0.3
+         + Math.cos(y * 2.7 + x * 1.8) * 0.2;
+}
+
+// ── SCROLL ──
+let scroll = 0, targetScroll = 0;
+const scrollHeight = document.getElementById('scroll-spacer').offsetHeight - innerHeight;
+
+const zones = document.querySelectorAll('.zone');
+const zoneLabel = document.getElementById('zoneLabel');
+const scrollHint = document.getElementById('scrollHint');
+const progressBar = document.getElementById('progressBar');
+
+const zoneNames = ['START', 'LEADERSHIP', 'GLS GROUP', 'DHL', 'RITUALS', 'HELLOFRESH', 'VALVE', 'FOUNDATION', 'CAPABILITIES', 'WHY DRAGONS', 'CONNECT'];
+const zoneThresholds = [0, 0.07, 0.15, 0.24, 0.33, 0.42, 0.51, 0.60, 0.69, 0.79, 0.90];
+
+let currentZone = 0;
+
+window.addEventListener('scroll', () => {
+    targetScroll = scrollY / scrollHeight;
+}, { passive: true });
+
+window.scrollToZone = function(index) {
+    window.scrollTo({ top: zoneThresholds[index] * scrollHeight, behavior: 'smooth' });
+};
+
+// ── ANIMATION ──
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+    const time = clock.getElapsedTime();
+
+    scroll += (targetScroll - scroll) * 0.06;
+
+    // Cursor
+    if (!isMobile) {
+        cursorX += (mouseX - cursorX) * 0.1;
+        cursorY += (mouseY - cursorY) * 0.1;
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+        cursorDot.style.left = mouseX + 'px';
+        cursorDot.style.top = mouseY + 'px';
+    }
+
+    progressBar.style.width = (scroll * 100) + '%';
+
+    // Zones
+    let newZone = 0;
+    for (let i = zoneThresholds.length - 1; i >= 0; i--) {
+        if (scroll >= zoneThresholds[i] - 0.03) { newZone = i; break; }
+    }
+    if (newZone !== currentZone) {
+        currentZone = newZone;
+        zoneLabel.textContent = zoneNames[currentZone];
+    }
+    zones.forEach((zone, i) => zone.classList.toggle('active', i === currentZone));
+    scrollHint.classList.toggle('hidden', scroll > 0.03);
+    document.querySelector('.zone-marker .num').textContent = String(currentZone + 1).padStart(2, '0');
+
+    // ── MORPH ──
+    const positions = shapeGeo.attributes.position.array;
+    const t = time * 0.4;
+    const morphIntensity = 0.4 + Math.sin(time * 0.3) * 0.15;
+
+    for (let i = 0; i < positions.length; i += 3) {
+        const ox = shapePositions[i], oy = shapePositions[i+1], oz = shapePositions[i+2];
+        const nx = shapeNormals[i], ny = shapeNormals[i+1], nz = shapeNormals[i+2];
+        const d = noise3D(ox*0.8+t, oy*0.8+t*0.7, oz*0.8+t*0.5) * morphIntensity;
+        positions[i] = ox + nx*d;
+        positions[i+1] = oy + ny*d;
+        positions[i+2] = oz + nz*d;
+    }
+    shapeGeo.attributes.position.needsUpdate = true;
+    shapeGeo.computeVertexNormals();
+
+    shapeMesh.rotation.y = time * 0.15 + scroll * Math.PI * 2;
+    shapeMesh.rotation.x = Math.sin(time * 0.1) * 0.15 + scroll * 0.5;
+    shapeMat.iridescenceThicknessRange = [100 + scroll*300, 800 - scroll*200];
+    shapeMat.sheenColor.setHSL(0.6 + scroll*0.2, 0.8, 0.5);
+
+    // Rings
+    ringGroup.rotation.y = time * 0.08;
+    ringGroup.rotation.x = Math.sin(time * 0.05) * 0.1;
+    ring1.rotation.z = time * 0.12;
+    ring2.rotation.z = -time * 0.08;
+    ring3.rotation.z = time * 0.06;
+
+    // Particles
+    const pArr = pGeo.attributes.position.array;
+    for (let i = 0; i < particleCount; i++) {
+        const idx = i*3, bp = pBasePos[i];
+        pArr[idx] = bp.x + Math.sin(time*0.2+i*0.5)*0.5;
+        pArr[idx+1] = bp.y + Math.cos(time*0.15+i*0.3)*0.4;
+        pArr[idx+2] = bp.z + Math.sin(time*0.1+i*0.2)*0.3;
+    }
+    pGeo.attributes.position.needsUpdate = true;
+
+    gridHelper.position.z = scroll * -10;
+    blueLight.intensity = 1.5 + Math.sin(time*0.5)*0.3;
+    purpleLight.intensity = 1.0 + Math.cos(time*0.4)*0.2;
+
+    // Camera — cinematic orbit
+    const mx = (mouseX / innerWidth - 0.5) * 2;
+    const my = (mouseY / innerHeight - 0.5) * -2;
+
+    const camAngle = scroll * Math.PI * 3.2;
+    const camRadius = 17 + Math.sin(scroll * Math.PI * 2.5) * 5
+                         - scroll * 3;
+    const camHeight = Math.sin(scroll * Math.PI * 2) * 4
+                    + Math.cos(scroll * Math.PI * 3.4) * 2;
+
+    camera.position.x = Math.sin(camAngle) * camRadius + mx * 1.2;
+    camera.position.y = camHeight + my * 0.8;
+    camera.position.z = Math.cos(camAngle) * camRadius;
+    camera.lookAt(0, 0, 0);
+
+    composer.render();
+}
+
+animate();
+
+window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    composer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
